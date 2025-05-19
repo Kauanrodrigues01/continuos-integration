@@ -1,5 +1,4 @@
 from http import HTTPStatus
-from datetime import datetime
 
 from factory.base import Factory
 from factory.faker import Faker
@@ -50,37 +49,28 @@ def test_create_todo_with_user_id(client, session, user, create_token):
 
 def test_list_todo(client, session, user, create_token):
     token = create_token(user.email)
-    
-    test_todo = TodoFactory(
-        user_id=user.id,
-        title="Tarefa importante",
-        description="Descrição detalhada da tarefa",
-        state=TodoState.doing
-    )
+
+    test_todo = TodoFactory(user_id=user.id, title='Tarefa importante', description='Descrição detalhada da tarefa', state=TodoState.doing)
     session.add(test_todo)
     session.commit()
 
-    response = client.get(
-        f'/todos',
-        headers={'Authorization': f'Bearer {token}'}
-    )
+    response = client.get('/todos', headers={'Authorization': f'Bearer {token}'})
 
     assert response.status_code == HTTPStatus.OK
-    
+
     response_data = response.json()
-    
+
     # Validação dos valores dos campos
     assert response_data[0]['id'] == test_todo.id
-    assert response_data[0]['title'] == "Tarefa importante"
-    assert response_data[0]['description'] == "Descrição detalhada da tarefa"
-    assert response_data[0]['state'] == "doing"
-    
+    assert response_data[0]['title'] == 'Tarefa importante'
+    assert response_data[0]['description'] == 'Descrição detalhada da tarefa'
+    assert response_data[0]['state'] == 'doing'
+
     # Validação dos tipos dos campos
     assert isinstance(response_data[0]['id'], int)
     assert isinstance(response_data[0]['title'], str)
     assert isinstance(response_data[0]['description'], str)
     assert isinstance(response_data[0]['state'], str)
-
 
 
 def test_list_todos_should_return_5_todos(client, session, user, create_token):
