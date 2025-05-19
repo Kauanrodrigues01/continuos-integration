@@ -6,18 +6,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Fazer checkout do repositório
+      - name: Checkout do repositório
         uses: actions/checkout@v4
 
-      - name: Instalar o Python
+      - name: Setup Python 3.13
         uses: actions/setup-python@v5
         with:
           python-version: '3.13'
+          cache: 'pip'   # Cache automático do pip para acelerar builds
+
+      - name: Atualizar pip
+        run: python -m pip install --upgrade pip
 
       - name: Instalar dependências
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r ./requirements_dev.txt
+        run: pip install -r ./requirements_dev.txt
 
       - name: Executar lint
         run: task lint
@@ -28,3 +30,9 @@ jobs:
           ALGORITHM: HS256
           ACCESS_TOKEN_EXPIRE_MINUTES: 30
         run: task test
+      
+      - name: Upload relatório coverage HTML
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: htmlcov/
